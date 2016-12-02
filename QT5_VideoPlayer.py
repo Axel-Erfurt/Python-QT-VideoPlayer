@@ -79,17 +79,12 @@ class VideoPlayer(QWidget):
         self.mediaPlayer.durationChanged.connect(self.durationChanged)
         self.mediaPlayer.error.connect(self.handleError)
 
-
     def openFile(self):
         fileName, _ = QFileDialog.getOpenFileName(self, "Open Movie",
                 '/Axel_1/Filme', "Videos (*.mp4 *.ts *.avi *.mpeg *.mpg *.mkv)")
 
         if fileName != '':
-            self.mediaPlayer.setMedia(
-                    QMediaContent(QUrl.fromLocalFile(fileName)))
-            self.playButton.setEnabled(True)
-            self.mediaPlayer.play()
-            self.hideSlider()
+            self.loadFilm(fileName)
 
     def play(self):
         if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
@@ -204,6 +199,25 @@ class VideoPlayer(QWidget):
         if event.buttons() == Qt.LeftButton:
             self.move(event.globalPos())
             event.accept() 
+	
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        files = [str(u.toLocalFile()) for u in event.mimeData().urls()]
+        for f in files:
+            print (f)
+            self.loadFilm(f)
+	
+    def loadFilm(self, f):
+            self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(f)))
+            self.playButton.setEnabled(True)
+            self.mediaPlayer.play()
+            self.hideSlider()
+	
     '''
     def mousePressEvent(player, QEvent):
             player.toggleSlider()
@@ -216,6 +230,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     player = VideoPlayer()
+    player.setAcceptDrops(True)
     player.setWindowTitle("QT5 Player")
     player.setWindowFlags(Qt.Widget | Qt.FramelessWindowHint)
     palette = QPalette()    
