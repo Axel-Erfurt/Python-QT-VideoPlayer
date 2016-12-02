@@ -1,4 +1,8 @@
 # PhononVideoPlayer
-Python PhononVideoPlayer
+VideoPlayer (Qt4)
 
-A VideoPlayer created in Python on Linux.
+# VideoSchneiden
+cut Video (Qt4)
+
+# QT5_Videoplayer
+VideoPlayer (Qt5)
