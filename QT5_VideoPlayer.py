@@ -207,10 +207,8 @@ class VideoPlayer(QWidget):
             event.ignore()
 
     def dropEvent(self, event):
-        files = [str(u.toLocalFile()) for u in event.mimeData().urls()]
-        for f in files:
-            print (f)
-            self.loadFilm(f)
+        f = str(event.mimeData().urls()[0].toLocalFile())
+        self.loadFilm(f)
 	
     def loadFilm(self, f):
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(f)))
