@@ -158,7 +158,7 @@ class VideoPlayer(QWidget):
             #msg.setTextFormat(Qt.RichText)
             msg.setStyleSheet('QMessageBox \
 				{background-color: darkcyan; color: white;}\nQPushButton{color: lightgrey; font-size: 12px; background-color: #1d1d1d; border-radius: 5px; padding: 6px; text-align: center;}\n QPushButton:hover{color: darkcyan;}')
-            msg.setWindowFlags(Qt.Widget | Qt.FramelessWindowHint)
+            msg.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
             msg.setGeometry(self.frameGeometry().left() + 30, self.frameGeometry().top() + 30, 300, 400)
             msg.setIcon(QMessageBox.Information)
             msg.setText("Axel Schneider\t\n\nPython with Qt5")
