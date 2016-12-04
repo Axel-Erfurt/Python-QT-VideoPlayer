@@ -23,7 +23,7 @@ class VideoPlayer(QWidget):
         self.playButton = QPushButton()
         self.playButton.setEnabled(False)
         self.playButton.setFixedWidth(32)
-        self.playButton.setStyleSheet("background-color: transparent")
+        self.playButton.setStyleSheet("background-color: black")
         self.playButton.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
         self.playButton.clicked.connect(self.play)
 
