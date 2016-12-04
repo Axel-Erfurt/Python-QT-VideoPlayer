@@ -8,17 +8,11 @@ from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWidgets import (QApplication, QFileDialog, QHBoxLayout, QLabel, 
         					QPushButton, QSizePolicy, QSlider, QStyle, QVBoxLayout,  
 							QWidget, QShortcut, QMessageBox, QSystemTrayIcon)
-import gi
-gi.require_version("Gtk", "2.0")
-from gi.repository import Gtk as gtk
+
 class VideoPlayer(QWidget):
 
     def __init__(self, parent=None):
         super(VideoPlayer, self).__init__(parent)
-
-        self.tray = gtk.StatusIcon()
-        self.tray.set_from_stock(gtk.STOCK_MEDIA_PAUSE)
-        self.tray.set_tooltip('QT5 Player')
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.mediaPlayer.setVolume(80)
@@ -106,10 +100,8 @@ class VideoPlayer(QWidget):
     def play(self):
         if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
             self.mediaPlayer.pause()
-            self.tray.set_from_stock(gtk.STOCK_MEDIA_PAUSE)
         else:
             self.mediaPlayer.play()
-            self.tray.set_from_stock(gtk.STOCK_MEDIA_PLAY)
 
     def mediaStateChanged(self, state):
         if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
@@ -178,10 +170,10 @@ class VideoPlayer(QWidget):
     def handleInfo(self):
             msg = QMessageBox()
             msg.setStyleSheet('QMessageBox \
-				{background-color: darkcyan; color: white;}\nQPushButton{color: lightgrey; font-size: 12px; background-color: #1d1d1d; border-radius: 5px; padding: 6px; text-align: center;}\n QPushButton:hover{color: darkcyan;}')
+				{background-color: darkcyan; color: black; border: 2px solid #70c1c1; }\nQLabel{color: #bcd1d1;}\nQPushButton{border: 2px solid #aaa; color: lightgrey; font-size: 12px; background-color: #036d6d; border-radius: 4px; padding: 6px; text-align: center;}\n QPushButton:hover{background-color: goldenrod; color: black;}')
             msg.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
             msg.setGeometry(self.frameGeometry().left() + 30, self.frameGeometry().top() + 30, 300, 400)
-            msg.setIcon(QMessageBox.Information)
+            #msg.setIcon(QMessageBox.Information)
             msg.setText("Axel Schneider\t\n\nPython with Qt5")
             msg.setInformativeText("©2016")
             msg.setWindowTitle("Phonon Player")
@@ -254,7 +246,6 @@ class VideoPlayer(QWidget):
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(f)))
             self.playButton.setEnabled(True)
             self.mediaPlayer.play()
-            self.tray.set_from_stock(gtk.STOCK_MEDIA_PLAY)
             self.hideSlider()
 	  
     def openFileAtStart(self, filelist):
