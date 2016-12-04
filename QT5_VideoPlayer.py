@@ -68,6 +68,12 @@ class VideoPlayer(QWidget):
         self.shortcut = QShortcut(QKeySequence(Qt.Key_Down), self)
         self.shortcut.activated.connect(self.volumeDown)	
 
+        self.shortcut = QShortcut(QKeySequence(Qt.ShiftModifier +  Qt.Key_Right) , self)
+        self.shortcut.activated.connect(self.forwardSlider10)
+
+        self.shortcut = QShortcut(QKeySequence(Qt.ShiftModifier +  Qt.Key_Left) , self)
+        self.shortcut.activated.connect(self.backSlider10)
+
         self.mediaPlayer.setVideoOutput(videoWidget)
         self.mediaPlayer.stateChanged.connect(self.mediaStateChanged)
         self.mediaPlayer.positionChanged.connect(self.positionChanged)
@@ -174,7 +180,8 @@ class VideoPlayer(QWidget):
             msg.setInformativeText("©2016")
             msg.setWindowTitle("Phonon Player")
             msg.setDetailedText("Mouse Wheel = Zoom\nUP = Volume Up\nDOWN = Volume Down\n" + \
-				"LEFT = Backward 1 Minute\nRIGHT = Forward 1 Minute")
+				"LEFT = < 1 Minute\nRIGHT = > 1 Minute\n" + \
+				"SHIFT+LEFT = < 10 Minutes\nSHIFT+RIGHT = > 10 Minutes")
             msg.setStandardButtons(QMessageBox.Close)
             msg.exec()
 	
@@ -199,9 +206,17 @@ class VideoPlayer(QWidget):
     def forwardSlider(self):
         self.mediaPlayer.setPosition(self.mediaPlayer.position() + 100*60)
         print("Position: " + ("%.2f" % (self.mediaPlayer.position()/100/60)))
+
+    def forwardSlider10(self):
+        self.mediaPlayer.setPosition(self.mediaPlayer.position() + 1000*60)
+        print("Position: " + ("%.2f" % (self.mediaPlayer.position()/1000/60)))
 		
     def backSlider(self):
         self.mediaPlayer.setPosition(self.mediaPlayer.position() - 100*60)
+        print("Position: " + ("%.2f" % (self.mediaPlayer.position()/100/60)))
+
+    def backSlider10(self):
+        self.mediaPlayer.setPosition(self.mediaPlayer.position() - 1000*60)
         print("Position: " + ("%.2f" % (self.mediaPlayer.position()/100/60)))
 		
     def volumeUp(self):
@@ -241,10 +256,12 @@ class VideoPlayer(QWidget):
                 self.loadFilm(matching)
 
 if __name__ == '__main__':
+    '''
     try:
         main()
     except Exception as e:
         print(str(e))
+    '''
 
     import sys
     app = QApplication(sys.argv)
