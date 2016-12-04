@@ -118,7 +118,7 @@ class VideoPlayer(QWidget):
 
     def handleError(self):
         self.playButton.setEnabled(False)
-        self.errorLabel.setText("Error: " + self.mediaPlayer.errorString())
+        print("Error: " + self.mediaPlayer.errorString())
 
     def handleQuit(self):
         self.mediaPlayer.stop()
@@ -133,6 +133,7 @@ class VideoPlayer(QWidget):
         action3 = menu.addSeparator() 
         actionToggle = menu.addAction("show / hide Slider (s)") 
         actionFull = menu.addAction("Fullscreen (f)")
+        action8 = menu.addSeparator()
         actionInfo = menu.addAction("Info (i)")
         action5 = menu.addSeparator() 
         actionQuit = menu.addAction("Exit (q)") 
@@ -240,6 +241,10 @@ class VideoPlayer(QWidget):
                 self.loadFilm(matching)
 
 if __name__ == '__main__':
+    try:
+        main()
+    except Exception as e:
+        print(str(e))
 
     import sys
     app = QApplication(sys.argv)
