@@ -1,35 +1,39 @@
 #!/usr/bin/env python3
-from PyQt5.QtGui import QPalette, QKeySequence
+from PyQt5.QtGui import QPalette, QKeySequence, QIcon
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5.QtCore import QDir, Qt, QUrl, QSize, QPoint
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
-from PyQt5.QtWidgets import (QApplication, QFileDialog, QHBoxLayout, QLabel,
-        QPushButton, QSizePolicy, QSlider, QStyle, QVBoxLayout, QWidget, QShortcut, QMessageBox)
-
+from PyQt5.QtWidgets import (QApplication, QFileDialog, QHBoxLayout, QLabel, 
+        					QPushButton, QSizePolicy, QSlider, QStyle, QVBoxLayout,  
+							QWidget, QShortcut, QMessageBox, QSystemTrayIcon)
+import gi
+gi.require_version("Gtk", "2.0")
+from gi.repository import Gtk as gtk
 class VideoPlayer(QWidget):
 
     def __init__(self, parent=None):
         super(VideoPlayer, self).__init__(parent)
 
+        self.tray = gtk.StatusIcon()
+        self.tray.set_from_stock(gtk.STOCK_MEDIA_PAUSE)
+        self.tray.set_tooltip('QT5 Player')
+
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.mediaPlayer.setVolume(80)
         videoWidget = QVideoWidget()
-	
-        openButton = QPushButton("Open...")
-        openButton.clicked.connect(self.openFile)
 
         self.playButton = QPushButton()
         self.playButton.setEnabled(False)
         self.playButton.setFixedWidth(32)
-        self.playButton.setStyleSheet("background-color: black")
+        self.playButton.setStyleSheet("background-color: transparent")
         self.playButton.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
         self.playButton.clicked.connect(self.play)
 
         self.positionSlider = QSlider(Qt.Horizontal)
-        self.positionSlider.setStyleSheet("background: transparent;")
-        #self.positionSlider.setFixedHeight(10)
+        self.positionSlider.setStyleSheet (stylesheet(self)) 
+        self.positionSlider.setFixedHeight(14)
         self.positionSlider.setRange(0, 0)
         self.positionSlider.sliderMoved.connect(self.setPosition)
         self.positionSlider.setAttribute(Qt.WA_TranslucentBackground, True)
@@ -102,8 +106,10 @@ class VideoPlayer(QWidget):
     def play(self):
         if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
             self.mediaPlayer.pause()
+            self.tray.set_from_stock(gtk.STOCK_MEDIA_PAUSE)
         else:
             self.mediaPlayer.play()
+            self.tray.set_from_stock(gtk.STOCK_MEDIA_PLAY)
 
     def mediaStateChanged(self, state):
         if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
@@ -160,7 +166,7 @@ class VideoPlayer(QWidget):
             self.setGeometry(self.frameGeometry().left(), self.frameGeometry().top(), \
 	        self.frameGeometry().width() \
 	        + event.angleDelta().y()/10, self.frameGeometry().width()/1.778)
-	
+
     def handleFullscreen(self):
         if self.windowState() & QtCore.Qt.WindowFullScreen:
             self.showNormal()
@@ -208,16 +214,16 @@ class VideoPlayer(QWidget):
         print("Position: " + ("%.2f" % (self.mediaPlayer.position()/100/60)))
 
     def forwardSlider10(self):
-        self.mediaPlayer.setPosition(self.mediaPlayer.position() + 1000*60)
-        print("Position: " + ("%.2f" % (self.mediaPlayer.position()/1000/60)))
-		
+            self.mediaPlayer.setPosition(self.mediaPlayer.position() + 1000*60)
+            print("%.0f" %  (self.mediaPlayer.position()/1000/60))
+
     def backSlider(self):
         self.mediaPlayer.setPosition(self.mediaPlayer.position() - 100*60)
         print("Position: " + ("%.2f" % (self.mediaPlayer.position()/100/60)))
 
     def backSlider10(self):
         self.mediaPlayer.setPosition(self.mediaPlayer.position() - 1000*60)
-        print("Position: " + ("%.2f" % (self.mediaPlayer.position()/100/60)))
+        print("Position: " + ("%.2f" % (self.mediaPlayer.position()/1000/10)))
 		
     def volumeUp(self):
         self.mediaPlayer.setVolume(self.mediaPlayer.volume() + 10)
@@ -248,12 +254,90 @@ class VideoPlayer(QWidget):
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(f)))
             self.playButton.setEnabled(True)
             self.mediaPlayer.play()
+            self.tray.set_from_stock(gtk.STOCK_MEDIA_PLAY)
             self.hideSlider()
 	  
     def openFileAtStart(self, filelist):
             matching = [s for s in filelist if ".myformat" in s]
             if len(matching) > 0:
                 self.loadFilm(matching)
+
+def stylesheet(self):
+    return """
+
+QSlider::groove:horizontal
+{
+    border: 1px solid #2a4849;
+    background: blue;
+    height: 6px;
+    border-radius: 2px;
+}
+
+QSlider::sub-page:horizontal
+{
+    background: #1c2a2b;
+    border: 1px solid #2a4849;
+    height: 6px;
+    border-radius: 2px;
+}
+
+QSlider::add-page:horizontal
+{
+    background: black;
+    border: 1px solid #2a4849;
+    height: 6px;
+    border-radius: 2px;
+}
+
+QSlider::handle:horizontal
+{
+    background: black;
+    border: 1px solid #2a4849;
+    width: 12px;
+    margin-top: -2px;
+    margin-bottom: -2px;
+    border-radius: 2px;
+}
+
+QSlider::handle:horizontal:hover
+{
+    background: #2a4849;
+    border: 1px solid #444;
+    border-radius: 2px;
+}
+
+QSlider::sub-page:horizontal:disabled
+{
+    background: black;
+    border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled
+{
+    background: #eee;
+    border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled
+{
+    background: #eee;
+    border: 1px solid #aaa;
+    border-radius: 2px;
+}
+
+QSlider::hover
+{
+border-width: 1px;
+border-style: solid;
+border-color: #2a4849;
+    background: black;
+    border-radius: 2px;
+}
+
+    """
+
+##########################################
+##########################################
 
 if __name__ == '__main__':
     '''
