@@ -14,6 +14,8 @@ class VideoPlayer(QWidget):
     def __init__(self, parent=None):
         super(VideoPlayer, self).__init__(parent)
 
+        self.setAttribute( Qt.WA_NoSystemBackground, True )
+
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.mediaPlayer.setVolume(80)
         videoWidget = QVideoWidget()
@@ -153,11 +155,11 @@ class VideoPlayer(QWidget):
         if self.positionSlider.isVisible():
             self.setGeometry(self.frameGeometry().left(), self.frameGeometry().top(), \
 	        self.frameGeometry().width() \
-	        + event.angleDelta().y()/10, self.frameGeometry().width()/1.55)
+	        + event.angleDelta().y()/10.00, self.frameGeometry().width()/1.55)
         else:
             self.setGeometry(self.frameGeometry().left(), self.frameGeometry().top(), \
 	        self.frameGeometry().width() \
-	        + event.angleDelta().y()/10, self.frameGeometry().width()/1.778)
+	        + event.angleDelta().y()/10.00, self.frameGeometry().width()/1.778)
 
     def handleFullscreen(self):
         if self.windowState() & QtCore.Qt.WindowFullScreen:
@@ -170,7 +172,14 @@ class VideoPlayer(QWidget):
     def handleInfo(self):
             msg = QMessageBox()
             msg.setStyleSheet('QMessageBox \
-				{background-color: darkcyan; color: black; border: 2px solid #70c1c1; }\nQLabel{color: #bcd1d1;}\nQPushButton{border: 2px solid #aaa; color: lightgrey; font-size: 12px; background-color: #036d6d; border-radius: 4px; padding: 6px; text-align: center;}\n QPushButton:hover{background-color: goldenrod; color: black;}')
+				{background-color: darkgoldenrod;  border: 2px solid grey; } \
+				\nQLabel{color: black;} \
+				\nQPushButton{border: 2px solid grey; \
+				color: black; font-size: 12px; \
+				background-color: goldenrod; \
+				border-radius: 4px; padding: 6px; \
+				text-align: center;} \
+				\n QPushButton:hover{background-color: gold; color: black;}')
             msg.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
             msg.setGeometry(self.frameGeometry().left() + 30, self.frameGeometry().top() + 30, 300, 400)
             #msg.setIcon(QMessageBox.Information)
@@ -331,12 +340,6 @@ border-color: #2a4849;
 ##########################################
 
 if __name__ == '__main__':
-    '''
-    try:
-        main()
-    except Exception as e:
-        print(str(e))
-    '''
 
     import sys
     app = QApplication(sys.argv)
@@ -344,9 +347,6 @@ if __name__ == '__main__':
     player.setAcceptDrops(True)
     player.setWindowTitle("QT5 Player")
     player.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-    palette = QPalette()    
-    palette.setColor(QPalette.Background,QtCore.Qt.black)    
-    player.setPalette(palette)
     player.setGeometry(10, 40, 400, 290)
     player.setContextMenuPolicy(QtCore.Qt.CustomContextMenu);
     player.customContextMenuRequested[QtCore.QPoint].connect(player.contextMenuRequested)
