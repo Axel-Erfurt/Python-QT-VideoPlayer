@@ -74,7 +74,6 @@ class VideoPlayer(QWidget):
         self.mediaPlayer.durationChanged.connect(self.durationChanged)
         self.mediaPlayer.error.connect(self.handleError)
 
-        #player.openFileAtStart(filelist)
         print("QT5 Player started")
 
     def openFile(self):
@@ -84,6 +83,15 @@ class VideoPlayer(QWidget):
         if fileName != '':
             self.loadFilm(fileName)
             print("File loaded")
+
+    def playFromURL(self):
+        self.mediaPlayer.pause()
+        clip = QApplication.clipboard()
+        myurl = clip.text()
+        self.mediaPlayer.setMedia(QMediaContent(QUrl(myurl)))
+        self.playButton.setEnabled(True)
+        self.mediaPlayer.play()
+        self.hideSlider()
 
     def play(self):
         if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
@@ -121,6 +129,8 @@ class VideoPlayer(QWidget):
         menu = QtWidgets.QMenu()
         actionFile = menu.addAction("open File (o)")
         action3 = menu.addSeparator() 
+        actionURL = menu.addAction("URL from Clipboard (u)")
+        action3 = menu.addSeparator() 
         actionToggle = menu.addAction("show / hide Slider (s)") 
         actionFull = menu.addAction("Fullscreen (f)")
         actionInfo = menu.addAction("Info (i)")
@@ -131,6 +141,7 @@ class VideoPlayer(QWidget):
         actionFull.triggered.connect(self.handleFullscreen)
         actionInfo.triggered.connect(self.handleInfo)
         actionToggle.triggered.connect(self.toggleSlider)
+        actionURL.triggered.connect(self.playFromURL)
         menu.exec_(self.mapToGlobal(point))
 	
     def wheelEvent(self,event):
@@ -138,12 +149,10 @@ class VideoPlayer(QWidget):
             self.setGeometry(self.frameGeometry().left(), self.frameGeometry().top(), \
 	        self.frameGeometry().width() \
 	        + event.angleDelta().y()/10, self.frameGeometry().width()/1.55)
-            print (self.x)
         else:
             self.setGeometry(self.frameGeometry().left(), self.frameGeometry().top(), \
 	        self.frameGeometry().width() \
-	        + event.angleDelta().y()/10, self.frameGeometry().width()/1.78)
-            print (self.x)
+	        + event.angleDelta().y()/10, self.frameGeometry().width()/1.778)
 	
     def handleFullscreen(self):
         if self.windowState() & QtCore.Qt.WindowFullScreen:
@@ -155,7 +164,6 @@ class VideoPlayer(QWidget):
 
     def handleInfo(self):
             msg = QMessageBox()
-            #msg.setTextFormat(Qt.RichText)
             msg.setStyleSheet('QMessageBox \
 				{background-color: darkcyan; color: white;}\nQPushButton{color: lightgrey; font-size: 12px; background-color: #1d1d1d; border-radius: 5px; padding: 6px; text-align: center;}\n QPushButton:hover{color: darkcyan;}')
             msg.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
@@ -179,7 +187,7 @@ class VideoPlayer(QWidget):
             self.positionSlider.hide()
             self.playButton.hide()
             self.setGeometry(self.frameGeometry().left(), self.frameGeometry().top(), \
-			self.frameGeometry().width(), self.frameGeometry().width()/1.78)
+			self.frameGeometry().width(), self.frameGeometry().width()/1.778)
 	
     def showSlider(self):	
             self.positionSlider.show()
@@ -209,7 +217,6 @@ class VideoPlayer(QWidget):
 						- QPoint(self.frameGeometry().width() / 2, \
 						self.frameGeometry().height() / 2))
             event.accept() 
-            #print("Position: " + str(event.globalPos()))
 		
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -238,7 +245,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     player = VideoPlayer()
     player.setAcceptDrops(True)
-    #player.setWindowFlags(Qt.Widget | Qt.WindowStaysOnTopHint)
     player.setWindowTitle("QT5 Player")
     player.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
     palette = QPalette()    
@@ -247,7 +253,6 @@ if __name__ == '__main__':
     player.setGeometry(10, 40, 400, 290)
     player.setContextMenuPolicy(QtCore.Qt.CustomContextMenu);
     player.customContextMenuRequested[QtCore.QPoint].connect(player.contextMenuRequested)
-    #player.setMouseTracking(True) 
     player.show()
     player.hideSlider()
 
