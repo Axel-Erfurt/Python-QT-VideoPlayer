@@ -29,7 +29,7 @@ class VideoPlayer(QWidget):
 
         self.positionSlider = QSlider(Qt.Horizontal)
         self.positionSlider.setStyleSheet (stylesheet(self)) 
-        self.positionSlider.setFixedHeight(14)
+#        self.positionSlider.setFixedHeight(20)
         self.positionSlider.setRange(0, 0)
         self.positionSlider.sliderMoved.connect(self.setPosition)
         self.positionSlider.setAttribute(Qt.WA_TranslucentBackground, True)
@@ -183,8 +183,8 @@ class VideoPlayer(QWidget):
             msg.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
             msg.setGeometry(self.frameGeometry().left() + 30, self.frameGeometry().top() + 30, 300, 400)
             #msg.setIcon(QMessageBox.Information)
-            msg.setText("Axel Schneider\t\n\nPython with Qt5")
-            msg.setInformativeText("©2016")
+            msg.setText("\tAxel Schneider\t\n\n\tPython with Qt5\t")
+            msg.setInformativeText("\t©2016\t")
             msg.setWindowTitle("Phonon Player")
             msg.setDetailedText("Mouse Wheel = Zoom\nUP = Volume Up\nDOWN = Volume Down\n" + \
 				"LEFT = < 1 Minute\nRIGHT = > 1 Minute\n" + \
@@ -265,75 +265,18 @@ class VideoPlayer(QWidget):
 def stylesheet(self):
     return """
 
-QSlider::groove:horizontal
+QSlider::handle:horizontal 
 {
-    border: 1px solid #2a4849;
-    background: blue;
-    height: 6px;
-    border-radius: 2px;
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #333, stop:1 #555);
+width: 14px;
+border-radius: 0px;
 }
 
-QSlider::sub-page:horizontal
-{
-    background: #1c2a2b;
-    border: 1px solid #2a4849;
-    height: 6px;
-    border-radius: 2px;
+QSlider::groove:horizontal {
+border: 1px solid #444;
+height: 10px;
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #000, stop:1 #222);
 }
-
-QSlider::add-page:horizontal
-{
-    background: black;
-    border: 1px solid #2a4849;
-    height: 6px;
-    border-radius: 2px;
-}
-
-QSlider::handle:horizontal
-{
-    background: black;
-    border: 1px solid #2a4849;
-    width: 12px;
-    margin-top: -2px;
-    margin-bottom: -2px;
-    border-radius: 2px;
-}
-
-QSlider::handle:horizontal:hover
-{
-    background: #2a4849;
-    border: 1px solid #444;
-    border-radius: 2px;
-}
-
-QSlider::sub-page:horizontal:disabled
-{
-    background: black;
-    border-color: #999;
-}
-
-QSlider::add-page:horizontal:disabled
-{
-    background: #eee;
-    border-color: #999;
-}
-
-QSlider::handle:horizontal:disabled
-{
-    background: #eee;
-    border: 1px solid #aaa;
-    border-radius: 2px;
-}
-
-QSlider::hover
-{
-border-width: 1px;
-border-style: solid;
-border-color: #2a4849;
-    background: black;
-    border-radius: 2px;
-}
-
     """
 
 ##########################################
@@ -347,7 +290,7 @@ if __name__ == '__main__':
     player.setAcceptDrops(True)
     player.setWindowTitle("QT5 Player")
     player.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-    player.setGeometry(10, 40, 400, 290)
+    player.setGeometry(10, 200, 400, 290)
     player.setContextMenuPolicy(QtCore.Qt.CustomContextMenu);
     player.customContextMenuRequested[QtCore.QPoint].connect(player.contextMenuRequested)
     player.show()
