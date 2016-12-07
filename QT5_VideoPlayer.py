@@ -296,12 +296,10 @@ class VideoPlayer(QWidget):
         self.loadFilm(f)
 	
     def loadFilm(self, f):
-            self.hideSlider()
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(f)))
             self.playButton.setEnabled(True)
             self.mediaPlayer.play()
             print(self.mediaPlayer.media().canonicalResource().resolution())
-            print(self.mediaPlayer.metaData("Resolution"))
 	  
     def openFileAtStart(self, filelist):
             matching = [s for s in filelist if ".myformat" in s]
@@ -354,5 +352,6 @@ if __name__ == '__main__':
     player.setGeometry(100, 300, 400, 290)
     player.setContextMenuPolicy(QtCore.Qt.CustomContextMenu);
     player.customContextMenuRequested[QtCore.QPoint].connect(player.contextMenuRequested)
+    player.hideSlider()
     player.show()
 sys.exit(app.exec_())
