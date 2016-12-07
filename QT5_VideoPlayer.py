@@ -6,12 +6,9 @@ from PyQt5.QtCore import QDir, Qt, QUrl, QSize, QPoint, QTime
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWidgets import (QApplication, QFileDialog, QHBoxLayout, QLineEdit,
-        					QPushButton, QSizePolicy, QSlider, QStyle, QVBoxLayout,  
+        					QPushButton, QSizePolicy, QSlider, QMessageBox, QStyle, QVBoxLayout,  
 							QWidget, QShortcut)
 import os
-import gi
-gi.require_version('Gtk', '2.0')
-from gi.repository import Gtk as gtk
 
 class VideoPlayer(QWidget):
 
@@ -64,7 +61,7 @@ class VideoPlayer(QWidget):
 
         self.setLayout(layout)
         
-        self.myinfo = "©2016Axel Schneider\n\nMouse Wheel = Zoom\nUP = Volume Up\nDOWN = Volume Down\n" + \
+        self.myinfo = "©2016\nAxel Schneider\n\nMouse Wheel = Zoom\nUP = Volume Up\nDOWN = Volume Down\n" + \
 				"LEFT = < 1 Minute\nRIGHT = > 1 Minute\n" + \
 				"SHIFT+LEFT = < 10 Minutes\nSHIFT+RIGHT = > 10 Minutes"
 		
@@ -187,7 +184,7 @@ class VideoPlayer(QWidget):
         mleft = self.frameGeometry().left()
         mtop = self.frameGeometry().top()
         mscale = event.angleDelta().y() / 5
-        if mwidth / mheight > 1.4:
+        if mwidth / mheight > 1.7:
             self.setGeometry(mleft, mtop, mwidth + mscale, (mwidth + mscale) / 1.778) 
         else:
             self.setGeometry(mleft, mtop, mwidth + mscale, (mwidth + mscale) / 1.33)            
@@ -217,20 +214,15 @@ class VideoPlayer(QWidget):
             print("Fullscreen entered")
 
     def handleInfo(self):
-        mwidth = self.frameGeometry().width()
-        mheight = self.frameGeometry().height()
-        mleft = self.frameGeometry().left()
-        mtop = self.frameGeometry().top()
-############################## dialog box ###################
-        dialog = gtk.MessageDialog(None, 0, 0,
-        gtk.ButtonsType.CLOSE, "QT5 Player")
-        dialog.format_secondary_text(self.myinfo)
-        dialog.set_keep_above(True)
-        dialog.set_decorated(False)
-        ret = dialog.run()
-        if ret == gtk.ResponseType.CLOSE:
-            dialog.destroy()
-#############################################################
+            msg = QMessageBox()
+            msg.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+            msg.setGeometry(self.frameGeometry().left() + 30, self.frameGeometry().top() + 30, 300, 400)
+            msg.setIcon(QMessageBox.Information)
+            msg.setText("QT5 Player")
+            msg.setInformativeText(self.myinfo)
+            msg.setStandardButtons(QMessageBox.Close)
+            msg.exec()
+            
     def toggleSlider(self):	
         if self.positionSlider.isVisible():
             self.hideSlider()
@@ -242,8 +234,14 @@ class VideoPlayer(QWidget):
             self.elbl.hide()
             self.positionSlider.hide()
             self.playButton.hide()
-            self.setGeometry(self.frameGeometry().left(), self.frameGeometry().top(), \
-			self.frameGeometry().width(), self.frameGeometry().width()/1.778)
+            mwidth = self.frameGeometry().width()
+            mheight = self.frameGeometry().height()
+            mleft = self.frameGeometry().left()
+            mtop = self.frameGeometry().top()
+            if mwidth / mheight < 1.7:
+                self.setGeometry(mleft, mtop, mwidth, mwidth / 1.778) 
+            else:
+                self.setGeometry(mleft, mtop, mwidth, mwidth / 1.55)
 	
     def showSlider(self):
             self.lbl.show()
@@ -251,20 +249,26 @@ class VideoPlayer(QWidget):
             self.lbl.update()
             self.positionSlider.show()
             self.playButton.show()
-            self.setGeometry(self.frameGeometry().left(), self.frameGeometry().top(), \
-			self.frameGeometry().width(), self.frameGeometry().width()/1.55)
+            mwidth = self.frameGeometry().width()
+            mheight = self.frameGeometry().height()
+            mleft = self.frameGeometry().left()
+            mtop = self.frameGeometry().top()
+            if mwidth / mheight < 1.7:
+                self.setGeometry(mleft, mtop, mwidth, mwidth / 1.33) 
+            else:
+                self.setGeometry(mleft, mtop, mwidth, mwidth / 1.55)
 	
     def forwardSlider(self):
-        self.mediaPlayer.setPosition(self.mediaPlayer.position() + 100*60)
+        self.mediaPlayer.setPosition(self.mediaPlayer.position() + 1000*60)
 
     def forwardSlider10(self):
-            self.mediaPlayer.setPosition(self.mediaPlayer.position() + 1000*60)
+            self.mediaPlayer.setPosition(self.mediaPlayer.position() + 10000*60)
 
     def backSlider(self):
-        self.mediaPlayer.setPosition(self.mediaPlayer.position() - 100*60)
+        self.mediaPlayer.setPosition(self.mediaPlayer.position() - 1000*60)
 
     def backSlider10(self):
-        self.mediaPlayer.setPosition(self.mediaPlayer.position() - 1000*60)
+        self.mediaPlayer.setPosition(self.mediaPlayer.position() - 10000*60)
 		
     def volumeUp(self):
         self.mediaPlayer.setVolume(self.mediaPlayer.volume() + 10)
@@ -355,6 +359,4 @@ if __name__ == '__main__':
     player.setContextMenuPolicy(QtCore.Qt.CustomContextMenu);
     player.customContextMenuRequested[QtCore.QPoint].connect(player.contextMenuRequested)
     player.show()
-    player.hideSlider()
-#    player.loadFilm('/Axel_1/Filme/maibock2016.mp4')
 sys.exit(app.exec_())
