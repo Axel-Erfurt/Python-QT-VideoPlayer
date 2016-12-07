@@ -308,16 +308,12 @@ class VideoPlayer(QWidget):
             if len(matching) > 0:
                 self.loadFilm(matching)
 
-###################################################################
+##################### update Label ##################################
     def handleLabel(self):
             self.lbl.clear()
             mtime = QTime(0,0,0,0)
             self.time = mtime.addMSecs(self.mediaPlayer.position())
             self.lbl.setText(self.time.toString())
-            print(str(self.mediaPlayer.position()) \
-            + " - " + self.time.toString())
-            app.processEvents()
-
 ###################################################################
 
 def stylesheet(self):
