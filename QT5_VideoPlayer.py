@@ -64,6 +64,8 @@ class VideoPlayer(QWidget):
         self.myinfo = "©2016\nAxel Schneider\n\nMouse Wheel = Zoom\nUP = Volume Up\nDOWN = Volume Down\n" + \
 				"LEFT = < 1 Minute\nRIGHT = > 1 Minute\n" + \
 				"SHIFT+LEFT = < 10 Minutes\nSHIFT+RIGHT = > 10 Minutes"
+
+        self.widescreen = True
 		
 		#### shortcuts ####
         self.shortcut = QShortcut(QKeySequence("q"), self)
@@ -184,12 +186,13 @@ class VideoPlayer(QWidget):
         mleft = self.frameGeometry().left()
         mtop = self.frameGeometry().top()
         mscale = event.angleDelta().y() / 5
-        if mwidth / mheight > 1.7:
+        if self.widescreen == True:
             self.setGeometry(mleft, mtop, mwidth + mscale, (mwidth + mscale) / 1.778) 
         else:
             self.setGeometry(mleft, mtop, mwidth + mscale, (mwidth + mscale) / 1.33)            
 
     def screen169(self):
+        self.widescreen = True
         mwidth = self.frameGeometry().width()
         mheight = self.frameGeometry().height()
         mleft = self.frameGeometry().left()
@@ -198,6 +201,7 @@ class VideoPlayer(QWidget):
         self.setGeometry(mleft, mtop, mwidth, mwidth / mratio)
 
     def screen43(self):
+        self.widescreen = False
         mwidth = self.frameGeometry().width()
         mheight = self.frameGeometry().height()
         mleft = self.frameGeometry().left()
@@ -230,33 +234,32 @@ class VideoPlayer(QWidget):
             self.showSlider()
 	
     def hideSlider(self):
-            self.lbl.hide()
-            self.elbl.hide()
-            self.positionSlider.hide()
             self.playButton.hide()
+            self.lbl.hide()
+            self.positionSlider.hide()
+            self.elbl.hide()
             mwidth = self.frameGeometry().width()
             mheight = self.frameGeometry().height()
             mleft = self.frameGeometry().left()
             mtop = self.frameGeometry().top()
-            if mwidth / mheight < 1.7:
+            if self.widescreen == True:
                 self.setGeometry(mleft, mtop, mwidth, mwidth / 1.778) 
             else:
-                self.setGeometry(mleft, mtop, mwidth, mwidth / 1.55)
+                self.setGeometry(mleft, mtop, mwidth, mwidth / 1.33)
 	
     def showSlider(self):
-            self.lbl.show()
-            self.elbl.show()
-            self.lbl.update()
-            self.positionSlider.show()
             self.playButton.show()
+            self.lbl.show()
+            self.positionSlider.show()
+            self.elbl.show()
             mwidth = self.frameGeometry().width()
             mheight = self.frameGeometry().height()
             mleft = self.frameGeometry().left()
             mtop = self.frameGeometry().top()
-            if mwidth / mheight < 1.7:
-                self.setGeometry(mleft, mtop, mwidth, mwidth / 1.33) 
+            if self.widescreen == True:
+                self.setGeometry(mleft, mtop, mwidth, mwidth / 1.55) 
             else:
-                self.setGeometry(mleft, mtop, mwidth, mwidth / 1.55)
+                self.setGeometry(mleft, mtop, mwidth, mwidth / 1.33)
 	
     def forwardSlider(self):
         self.mediaPlayer.setPosition(self.mediaPlayer.position() + 1000*60)
@@ -354,4 +357,5 @@ if __name__ == '__main__':
     player.customContextMenuRequested[QtCore.QPoint].connect(player.contextMenuRequested)
     player.hideSlider()
     player.show()
+    player.widescreen = True
 sys.exit(app.exec_())
