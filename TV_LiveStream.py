@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtGui import QPalette, QKeySequence, QIcon
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import QDir, Qt, QUrl, QSize, QPoint, QTime
+from PyQt5.QtCore import Qt, QUrl, QSize, QPoint, QTime
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
-from PyQt5.QtWidgets import (QApplication, QFileDialog, QHBoxLayout, QLineEdit,
-        					QPushButton, QSizePolicy, QSlider, QMessageBox, QStyle, QVBoxLayout,  
+from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QSizePolicy, QMessageBox, QStyle, QVBoxLayout,  
 							QWidget, QShortcut)
 import os
 
@@ -20,6 +19,7 @@ class VideoPlayer(QWidget):
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.mediaPlayer.setVolume(80)
         self.videoWidget = QVideoWidget(self)
+        self.videoWidget.setAspectRatioMode(0)
 
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -94,6 +94,8 @@ class VideoPlayer(QWidget):
 
         actionsep2 = menu.addSeparator() 
         actionFull = menu.addAction("Fullscreen (f)")
+        action169 = menu.addAction("16 : 9")
+        action43 = menu.addAction("4 : 3")
         actionSep = menu.addSeparator()
         actionInfo = menu.addAction("Info (i)")
         action5 = menu.addSeparator() 
@@ -120,6 +122,8 @@ class VideoPlayer(QWidget):
         actionORF1.triggered.connect(self.handleORF1)
         actionORF2.triggered.connect(self.handleORF2)
         actionORF3.triggered.connect(self.handleORF3)
+        action169.triggered.connect(self.screen169)
+        action43.triggered.connect(self.screen43)
 
         menu.exec_(self.mapToGlobal(point))
 
@@ -129,7 +133,10 @@ class VideoPlayer(QWidget):
         mleft = self.frameGeometry().left()
         mtop = self.frameGeometry().top()
         mscale = event.angleDelta().y() / 5
-        self.setGeometry(mleft, mtop, mwidth + mscale, (mwidth + mscale) / 1.778)         
+        if self.widescreen == True:
+            self.setGeometry(mleft, mtop, mwidth + mscale, (mwidth + mscale) / 1.778) 
+        else:
+            self.setGeometry(mleft, mtop, mwidth + mscale, (mwidth + mscale) / 1.33)            
 
     def handleFullscreen(self):
         if self.windowState() & QtCore.Qt.WindowFullScreen:
@@ -163,6 +170,24 @@ class VideoPlayer(QWidget):
 						- QPoint(self.frameGeometry().width() / 2, \
 						self.frameGeometry().height() / 2))
             event.accept() 
+
+    def screen169(self):
+        self.widescreen = True
+        mwidth = self.frameGeometry().width()
+        mheight = self.frameGeometry().height()
+        mleft = self.frameGeometry().left()
+        mtop = self.frameGeometry().top()
+        mratio = 1.778
+        self.setGeometry(mleft, mtop, mwidth, mwidth / mratio)
+
+    def screen43(self):
+        self.widescreen = False
+        mwidth = self.frameGeometry().width()
+        mheight = self.frameGeometry().height()
+        mleft = self.frameGeometry().left()
+        mtop = self.frameGeometry().top()
+        mratio = 1.33
+        self.setGeometry(mleft, mtop, mwidth, mwidth / mratio)
 ############################### TV ################################
     def handleARD(self):
         myurl = "http://daserste_live-lh.akamaihd.net/i/daserste_de@91204/master.m3u8"
@@ -260,8 +285,9 @@ if __name__ == '__main__':
     player.setAcceptDrops(True)
     player.setWindowTitle("QT5 Player")
     player.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-    player.setGeometry(700, 400, 400, 400/1.778)
+    player.setGeometry(0, 0, 720, 720/1.778)
     player.setContextMenuPolicy(QtCore.Qt.CustomContextMenu);
     player.customContextMenuRequested[QtCore.QPoint].connect(player.contextMenuRequested)
+#    player.handleARD()
     player.show()
 sys.exit(app.exec_())
