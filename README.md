@@ -21,7 +21,6 @@ pyinstaller -y --distpath="." -p "/usr/lib/python3/dist-packages/PyQt5/" QT5_Vid
 
 # TV_Livestream
 German TV Livestrems
-(Live Streams der öffentlich rechtlichen Fernsehanstalten)
-+ ORF
+(Live Streams der öffentlich rechtlichen Fernsehanstalten + ORF)
 
 [Download 32 bit Linux App](https://www.dropbox.com/s/xneo85waxtz1r09/TV_LiveStream_32bit.tar.gz?dl=1)
