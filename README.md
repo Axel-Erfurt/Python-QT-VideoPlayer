@@ -17,6 +17,8 @@ pyinstaller -y --distpath="." -p "/usr/lib/python3/dist-packages/PyQt5/" QT5_Vid
 ```
 [Download 32 bit compiled Linux App](https://www.dropbox.com/s/66lw4rithsk1789/QT5_VideoPlayer.zip?dl=1)
 
+[Download 64 bit compiled Linux App](https://www.dropbox.com/s/0yxfsgd652b1o7b/QT5_VideoPlayer_64bit.tar.gz?dl=1)
+
 # TV_Livestream
 German TV Livestrems
 (Live Streams der öffentlich rechtlichen Fernsehanstalten)
