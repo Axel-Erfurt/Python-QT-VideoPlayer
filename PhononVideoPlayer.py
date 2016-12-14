@@ -3,6 +3,7 @@ from PyQt4.QtGui import QSizePolicy, QListWidget, QListWidgetItem, \
 QMenu, QTableWidget, QFileDialog, QAction, QCursor
 from PyQt4.phonon import Phonon
 from PyQt4.Qt import QSize, QString, Qt, QStatusBar, QIcon, QImage, QGraphicsOpacityEffect, QMessageBox
+from PyQt4.QtCore import QPoint
 
 class Window(QtGui.QWidget):
     def __init__(self):
@@ -68,11 +69,12 @@ class Window(QtGui.QWidget):
             self.showFullScreen()
 	
     def wheelEvent(self,event):
-        self.slider.hide()
-        window.setGeometry(window.frameGeometry().left(), window.frameGeometry().top(), \
-	window.frameGeometry().width() \
-	+ event.delta()/15, window.frameGeometry().width()/1.78)
-        print (self.x)
+        mwidth = self.frameGeometry().width()
+        mheight = self.frameGeometry().height()
+        mleft = self.frameGeometry().left()
+        mtop = self.frameGeometry().top()
+        mscale = event.delta() / 5
+        self.setGeometry(mleft, mtop, mwidth + mscale, (mwidth + mscale) / 1.778) 
 	
     def loadpopup(self, pos):
         lmenu = QMenu()
@@ -129,6 +131,13 @@ class Window(QtGui.QWidget):
                 	Phonon.createPath(self.media, self.video)
                 	self.slider.hide()
                 	self.media.play()
+
+    def mouseMoveEvent(self, event):   
+        if event.buttons() == Qt.LeftButton:
+            self.move(event.globalPos() \
+						- QPoint(self.frameGeometry().width() / 2, \
+						self.frameGeometry().height() / 2))
+            event.accept() 
 	
 def stylesheet(self):
         return """
