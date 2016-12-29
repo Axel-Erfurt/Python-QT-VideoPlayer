@@ -70,6 +70,8 @@ class VideoPlayer(QWidget):
 		#### shortcuts ####
         self.shortcut = QShortcut(QKeySequence("q"), self)
         self.shortcut.activated.connect(self.handleQuit)
+        self.shortcut = QShortcut(QKeySequence("u"), self)
+        self.shortcut.activated.connect(self.playFromURL)
         self.shortcut = QShortcut(QKeySequence("o"), self)
         self.shortcut.activated.connect(self.openFile)
         self.shortcut = QShortcut(QKeySequence(" "), self)
