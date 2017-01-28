@@ -12,8 +12,8 @@ import os
 
 class VideoPlayer(QWidget):
 
-    def __init__(self):
-        super(VideoPlayer, self).__init__()
+    def __init__(self, aPath, parent=None):
+        super(VideoPlayer, self).__init__(parent)
 
         self.setAttribute( Qt.WA_NoSystemBackground, True )
 
@@ -22,11 +22,15 @@ class VideoPlayer(QWidget):
         self.videoWidget = QVideoWidget(self)
         
         self.lbl = QLineEdit('00:00:00')
+        self.lbl.setReadOnly(True)
+#        self.lbl.setDisabled(False)
         self.lbl.setFixedWidth(60)
         self.lbl.setUpdatesEnabled(True)
         self.lbl.setStyleSheet(stylesheet(self))
         
         self.elbl = QLineEdit('00:00:00')
+        self.elbl.setReadOnly(True)
+#        self.elbl.setDisabled(True)
         self.elbl.setFixedWidth(60)
         self.elbl.setUpdatesEnabled(True)
         self.elbl.setStyleSheet(stylesheet(self))
@@ -66,6 +70,9 @@ class VideoPlayer(QWidget):
 				"SHIFT+LEFT = < 10 Minutes\nSHIFT+RIGHT = > 10 Minutes"
 
         self.widescreen = True
+        
+        if aPath is not None:
+            self.loadFilm(aPath)
 		
 		#### shortcuts ####
         self.shortcut = QShortcut(QKeySequence("q"), self)
@@ -116,7 +123,10 @@ class VideoPlayer(QWidget):
         self.mediaPlayer.pause()
         clip = QApplication.clipboard()
         myurl = clip.text()
-        self.mediaPlayer.setMedia(QMediaContent(QUrl(myurl)))
+        if myurl.startswith("http"):
+            self.mediaPlayer.setMedia(QMediaContent(QUrl(myurl)))
+        else:
+            self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(myurl)))
         self.playButton.setEnabled(True)
         self.mediaPlayer.play()
         self.hideSlider()
@@ -161,7 +171,7 @@ class VideoPlayer(QWidget):
         menu = QtWidgets.QMenu()
         actionFile = menu.addAction("open File (o)")
         actionclipboard = menu.addSeparator() 
-        actionURL = menu.addAction("URL from Clipboard (u)")
+        actionURL = menu.addAction("URL / File from Clipboard (u)")
         actionclipboard = menu.addSeparator() 
         actionToggle = menu.addAction("show / hide Slider (s)") 
         actionFull = menu.addAction("Fullscreen (f)")
@@ -221,7 +231,7 @@ class VideoPlayer(QWidget):
 
     def handleInfo(self):
             msg = QMessageBox()
-            msg.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+            msg.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.SplashScreen)
             msg.setGeometry(self.frameGeometry().left() + 30, self.frameGeometry().top() + 30, 300, 400)
             msg.setIcon(QMessageBox.Information)
             msg.setText("QT5 Player")
@@ -350,7 +360,7 @@ if __name__ == '__main__':
     import sys
     app = QApplication(sys.argv)
 
-    player = VideoPlayer()
+    player = VideoPlayer('')
     player.setAcceptDrops(True)
     player.setWindowTitle("QT5 Player")
     player.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
@@ -360,4 +370,7 @@ if __name__ == '__main__':
     player.hideSlider()
     player.show()
     player.widescreen = True
+    if len(sys.argv) > 1:
+        print(sys.argv[1])
+        player.loadFilm(sys.argv[1])
 sys.exit(app.exec_())
