@@ -1,9 +1,9 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from PyQt4 import QtGui, QtCore
-from PyQt4.QtGui import QSizePolicy, QListWidget, QListWidgetItem, \
-QMenu, QTableWidget, QFileDialog, QAction, QCursor
+from PyQt4.QtGui import QSizePolicy, QMenu, QFileDialog, QAction, QCursor
 from PyQt4.phonon import Phonon
-from PyQt4.Qt import QSize, QString, Qt, QStatusBar, QIcon, QImage, QGraphicsOpacityEffect, QMessageBox
-from PyQt4.QtCore import QPoint
+from PyQt4.Qt import QSize, QString, Qt, QIcon, QMessageBox
 
 class Window(QtGui.QWidget):
     def __init__(self):
@@ -39,10 +39,9 @@ class Window(QtGui.QWidget):
         layout = QtGui.QGridLayout(self)
         layout.setMargin(1)
         layout.addWidget(self.video, 0, 0, 1, 1)
-        layout.addWidget(self.slider, 0, 0, 1, 1)
-        layout.setColumnStretch (0, 1)
-        layout.setRowStretch (0, 0)
-        layout.setHorizontalSpacing(6)
+        layout.addWidget(self.slider, 1, 0, 1, 1)
+
+        self.setStyleSheet(stylesheet(self))
 	
         #self.createPopup()
 	
@@ -90,6 +89,7 @@ class Window(QtGui.QWidget):
         contextmenu.addAction("Load Video (o)", self.handleButton)
         contextmenu.addAction("Toggle Slider (s)", self.toggleSlider)
         contextmenu.addSeparator()
+        contextmenu.addAction("Fullscreen (f)", self.handleFullscreen)
         contextmenu.addAction("Information (i)", self.handleInfo)
         contextmenu.addSeparator()
         contextmenu.addAction("Exit (q)", self.handleQuit)
@@ -100,7 +100,7 @@ class Window(QtGui.QWidget):
             self.slider.hide()
         else:
             self.slider.show()
-            self.slider.setGeometry(10, self.frameGeometry().height() - 20, self.frameGeometry().width() - 20, 14)
+#            self.slider.setGeometry(10, self.frameGeometry().height() - 10, self.frameGeometry().width() - 20, 10)
             self.slider.setFocus()
 	
     def handleInfo(self):
@@ -135,27 +135,28 @@ class Window(QtGui.QWidget):
     def mouseMoveEvent(self, event):   
         if event.buttons() == Qt.LeftButton:
             self.move(event.globalPos() \
-						- QPoint(self.frameGeometry().width() / 2, \
+						- QtCore.QPoint(self.frameGeometry().width() / 2, \
 						self.frameGeometry().height() / 2))
             event.accept() 
 	
 def stylesheet(self):
         return """
-	
+QWidget 
+{
+	background: black;
+}
 Phonon--SeekSlider > QSlider::groove:horizontal 
 {
 	background: black;
 	border: 1px solid #565656;
-	height: 4px;
-	border-radius: 0px;
+	height: 6px;
 }
 
 Phonon--SeekSlider > QSlider::sub-page:horizontal 
 {
 	background: blue;
 	border: 1px solid #565656;
-	height: 2px;
-	border-radius: 0px;
+	height: 3px;
 }
         """
 
