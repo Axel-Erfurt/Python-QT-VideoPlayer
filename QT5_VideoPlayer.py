@@ -122,6 +122,8 @@ class VideoPlayer(QWidget):
 
         print("QT5 Player started")
         self.suspend_screensaver()
+#        msg = QMessageBox.information(self, "Qt5Player", "press o to open file")
+        self.loadFilm("/home/brian/Dokumente/Qt5PlayerIntro.m4v")
 
     def playFromURL(self):
         self.mediaPlayer.pause()
@@ -257,10 +259,12 @@ class VideoPlayer(QWidget):
 
     def handleFullscreen(self):
         if self.windowState() & Qt.WindowFullScreen:
+            QApplication.setOverrideCursor(Qt.ArrowCursor)
             self.showNormal()
             print("no Fullscreen")
         else:
             self.showFullScreen()
+            QApplication.setOverrideCursor(Qt.BlankCursor)
             print("Fullscreen entered")
 
     def handleInfo(self):
@@ -337,24 +341,26 @@ class VideoPlayer(QWidget):
 
     def dropEvent(self, event):
         if event.mimeData().hasUrls():
-            f = str(event.mimeData().urls()[0].toLocalFile())
-            self.loadFilm(f)
+            url = event.mimeData().urls()[0].toString()
+            print("url = ", url)
+            self.mediaPlayer.stop()
+            self.mediaPlayer.setMedia(QMediaContent(QUrl(url)))
+            self.playButton.setEnabled(True)
+            self.mediaPlayer.play()
         elif event.mimeData().hasText():
-            mydrop = str(event.mimeData().text())
-            print(mydrop)
+            mydrop =  event.mimeData().text()
             ### YouTube url
-            if "https://www.youtube" in mydrop:
-                print("is YouTube")
-#                mydrop = mydrop.partition("&")[0].replace("watch?v=", "v/")
+            if "youtube" in mydrop:
+                print("is YouTube", mydrop)
                 self.clip.setText(mydrop)
                 self.getYTUrl()
             else:
                 ### normal url
+                print("generic url = ", mydrop)
                 self.mediaPlayer.setMedia(QMediaContent(QUrl(mydrop)))
                 self.playButton.setEnabled(True)
                 self.mediaPlayer.play()
                 self.hideSlider()
-            print(mydrop)
     
     def loadFilm(self, f):
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(f)))
@@ -387,15 +393,43 @@ def stylesheet(self):
 
 QSlider::handle:horizontal 
 {
-background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #333, stop:1 #555555);
-width: 14px;
-border-radius: 0px;
+background: transparent;
+width: 8px;
 }
 
 QSlider::groove:horizontal {
-border: 1px solid #444;
-height: 10px;
-background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #000, stop:1 #222222);
+border: 1px solid #444444;
+height: 8px;
+     background: qlineargradient(y1: 0, y2: 1,
+                                 stop: 0 #2e3436, stop: 1.0 #000000);
+}
+
+QSlider::sub-page:horizontal {
+background: qlineargradient( y1: 0, y2: 1,
+    stop: 0 #729fcf, stop: 1 #2a82da);
+border: 1px solid #777;
+height: 8px;
+}
+
+QSlider::handle:horizontal:hover {
+background: #2a82da;
+height: 8px;
+width: 8px;
+border: 1px solid #2e3436;
+}
+
+QSlider::sub-page:horizontal:disabled {
+background: #bbbbbb;
+border-color: #999999;
+}
+
+QSlider::add-page:horizontal:disabled {
+background: #2a82da;
+border-color: #999999;
+}
+
+QSlider::handle:horizontal:disabled {
+background: #2a82da;
 }
 
 QLineEdit
@@ -416,6 +450,7 @@ if __name__ == '__main__':
     player = VideoPlayer('')
     player.setAcceptDrops(True)
     player.setWindowTitle("QT5 Player")
+    player.setWindowIcon(QIcon.fromTheme("multimedia-video-player"))
     player.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
     player.setGeometry(100, 300, 600, 380)
     player.setContextMenuPolicy(Qt.CustomContextMenu);
