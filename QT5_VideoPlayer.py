@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtGui import QPalette, QKeySequence, QIcon
-from PyQt5.QtCore import QDir, Qt, QUrl, QSize, QPoint, QTime, QMimeData, QProcess
+from PyQt5.QtCore import QDir, Qt, QUrl, QSize, QPoint, QTime, QMimeData, QProcess, QEvent
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer, QMediaMetaData
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWidgets import (QApplication, QFileDialog, QHBoxLayout, QLineEdit,
@@ -119,11 +119,11 @@ class VideoPlayer(QWidget):
         self.mediaPlayer.positionChanged.connect(self.handleLabel)
         self.mediaPlayer.durationChanged.connect(self.durationChanged)
         self.mediaPlayer.error.connect(self.handleError)
+        self.setToolTip("press 'o' to open file (see context menu for more)")
 
         print("QT5 Player started")
+        print("press 'o' to open file (see context menu for more)")
         self.suspend_screensaver()
-#        msg = QMessageBox.information(self, "Qt5Player", "press o to open file")
-        self.loadFilm("/home/brian/Dokumente/Qt5PlayerIntro.m4v")
 
     def playFromURL(self):
         self.mediaPlayer.pause()
@@ -324,12 +324,13 @@ class VideoPlayer(QWidget):
         self.mediaPlayer.setVolume(self.mediaPlayer.volume() - 10)
         print("Volume: " + str(self.mediaPlayer.volume()))
         
-    def mouseMoveEvent(self, event):   
+    def mouseMoveEvent(self, event):
         if event.buttons() == Qt.LeftButton:
             self.move(event.globalPos() \
                         - QPoint(self.frameGeometry().width() / 2, \
                         self.frameGeometry().height() / 2))
-            event.accept() 
+            event.accept()
+            
         
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -340,6 +341,7 @@ class VideoPlayer(QWidget):
             event.ignore()
 
     def dropEvent(self, event):
+        print("drop")
         if event.mimeData().hasUrls():
             url = event.mimeData().urls()[0].toString()
             print("url = ", url)
@@ -444,9 +446,7 @@ font-weight: bold;
 
 if __name__ == '__main__':
 
-#    QApplication.setDesktopSettingsAware(False)
     app = QApplication(sys.argv)
-
     player = VideoPlayer('')
     player.setAcceptDrops(True)
     player.setWindowTitle("QT5 Player")
@@ -460,5 +460,9 @@ if __name__ == '__main__':
     player.widescreen = True
     if len(sys.argv) > 1:
         print(sys.argv[1])
-        player.loadFilm(sys.argv[1])
+        if sys.argv[1].startswith("http"):
+            player.myurl = sys.argv[1]
+            player.playFromURL()
+        else:
+            player.loadFilm(sys.argv[1])
 sys.exit(app.exec_())
