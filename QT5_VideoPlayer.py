@@ -30,12 +30,14 @@ class VideoPlayer(QWidget):
         self.lbl.setFixedWidth(70)
         self.lbl.setUpdatesEnabled(True)
         self.lbl.setStyleSheet(stylesheet(self))
+        self.lbl.selectionChanged.connect(lambda: self.lbl.setSelection(0, 0))
         
         self.elbl = QLineEdit('00:00:00')
         self.elbl.setReadOnly(True)
         self.elbl.setFixedWidth(70)
         self.elbl.setUpdatesEnabled(True)
         self.elbl.setStyleSheet(stylesheet(self))
+        self.elbl.selectionChanged.connect(lambda: self.elbl.setSelection(0, 0))
 
         self.playButton = QPushButton()
         self.playButton.setEnabled(False)
@@ -48,7 +50,6 @@ class VideoPlayer(QWidget):
         self.positionSlider.setStyleSheet (stylesheet(self)) 
         self.positionSlider.setRange(0, 100)
         self.positionSlider.sliderMoved.connect(self.setPosition)
-        self.positionSlider.sliderMoved.connect(self.handleLabel)
         self.positionSlider.setSingleStep(2)
         self.positionSlider.setPageStep(20)
         self.positionSlider.setAttribute(Qt.WA_TranslucentBackground, True)
@@ -56,7 +57,6 @@ class VideoPlayer(QWidget):
         self.clip = QApplication.clipboard()
         self.process = QProcess(self)
         self.process.readyRead.connect(self.dataReady)
-#        self.process.started.connect(lambda: print("grabbing YouTube URL"))
         self.process.finished.connect(self.playFromURL)
 
         self.myurl = ""
@@ -116,14 +116,15 @@ class VideoPlayer(QWidget):
         self.mediaPlayer.setVideoOutput(self.videoWidget)
         self.mediaPlayer.stateChanged.connect(self.mediaStateChanged)
         self.mediaPlayer.positionChanged.connect(self.positionChanged)
-        self.mediaPlayer.positionChanged.connect(self.handleLabel)
         self.mediaPlayer.durationChanged.connect(self.durationChanged)
         self.mediaPlayer.error.connect(self.handleError)
-        self.setToolTip("press 'o' to open file (see context menu for more)")
 
         print("QT5 Player started")
         print("press 'o' to open file (see context menu for more)")
         self.suspend_screensaver()
+        
+    def mouseDoubleClickEvent(self, event):
+        self.handleFullscreen()
 
     def playFromURL(self):
         self.mediaPlayer.pause()
@@ -180,6 +181,9 @@ class VideoPlayer(QWidget):
 
     def positionChanged(self, position):
         self.positionSlider.setValue(position)
+        mtime = QTime(0,0,0,0)
+        mtime = mtime.addMSecs(self.mediaPlayer.position())
+        self.lbl.setText(mtime.toString())
         
     def durationChanged(self, duration):
         self.positionSlider.setRange(0, duration)
@@ -235,9 +239,11 @@ class VideoPlayer(QWidget):
         mtop = self.frameGeometry().top()
         mscale = event.angleDelta().y() / 5
         if self.widescreen == True:
-            self.setGeometry(mleft, mtop, mwidth + mscale, (mwidth + mscale) / 1.778) 
+            self.setGeometry(mleft, mtop, mwidth + mscale, round((mwidth + mscale) / 1.778)) 
         else:
-            self.setGeometry(mleft, mtop, mwidth + mscale, (mwidth + mscale) / 1.33)            
+            self.setGeometry(mleft, mtop, mwidth + mscale, round((mwidth + mscale) / 1.33))
+        #elif self.positionSlider.hasFocus():
+        #    self.positionSlider.value = self.positionSlider.value + 5
 
     def screen169(self):
         self.widescreen = True
@@ -246,7 +252,7 @@ class VideoPlayer(QWidget):
         mleft = self.frameGeometry().left()
         mtop = self.frameGeometry().top()
         mratio = 1.778
-        self.setGeometry(mleft, mtop, mwidth, mwidth / mratio)
+        self.setGeometry(mleft, mtop, mwidth, round(mwidth / mratio))
 
     def screen43(self):
         self.widescreen = False
@@ -255,7 +261,7 @@ class VideoPlayer(QWidget):
         mleft = self.frameGeometry().left()
         mtop = self.frameGeometry().top()
         mratio = 1.33
-        self.setGeometry(mleft, mtop, mwidth, mwidth / mratio)
+        self.setGeometry(mleft, mtop, mwidth, round(mwidth / mratio))
 
     def handleFullscreen(self):
         if self.windowState() & Qt.WindowFullScreen:
@@ -286,9 +292,9 @@ class VideoPlayer(QWidget):
             mleft = self.frameGeometry().left()
             mtop = self.frameGeometry().top()
             if self.widescreen == True:
-                self.setGeometry(mleft, mtop, mwidth, mwidth / 1.778) 
+                self.setGeometry(mleft, mtop, mwidth, round(mwidth / 1.778))
             else:
-                self.setGeometry(mleft, mtop, mwidth, mwidth / 1.33)
+                self.setGeometry(mleft, mtop, mwidth, round(mwidth / 1.33))
     
     def showSlider(self):
             self.playButton.show()
@@ -300,9 +306,9 @@ class VideoPlayer(QWidget):
             mleft = self.frameGeometry().left()
             mtop = self.frameGeometry().top()
             if self.widescreen == True:
-                self.setGeometry(mleft, mtop, mwidth, mwidth / 1.55) 
+                self.setGeometry(mleft, mtop, mwidth, round(mwidth / 1.55))
             else:
-                self.setGeometry(mleft, mtop, mwidth, mwidth / 1.33)
+                self.setGeometry(mleft, mtop, mwidth, round(mwidth / 1.33))
     
     def forwardSlider(self):
         self.mediaPlayer.setPosition(self.mediaPlayer.position() + 1000*60)
@@ -323,13 +329,14 @@ class VideoPlayer(QWidget):
     def volumeDown(self):
         self.mediaPlayer.setVolume(self.mediaPlayer.volume() - 10)
         print("Volume: " + str(self.mediaPlayer.volume()))
-        
-    def mouseMoveEvent(self, event):
-        if event.buttons() == Qt.LeftButton:
-            self.move(event.globalPos() \
-                        - QPoint(self.frameGeometry().width() / 2, \
-                        self.frameGeometry().height() / 2))
-            event.accept()
+    
+    def mousePressEvent(self, evt):
+        self.oldPos = evt.globalPos()
+
+    def mouseMoveEvent(self, evt):
+        delta = QPoint(evt.globalPos() - self.oldPos)
+        self.move(self.x() + delta.x(), self.y() + delta.y())
+        self.oldPos = evt.globalPos()
             
         
     def dragEnterEvent(self, event):
@@ -372,8 +379,12 @@ class VideoPlayer(QWidget):
     def printMediaData(self):
         if self.mediaPlayer.mediaStatus() == 6:
             if self.mediaPlayer.isMetaDataAvailable():
-                res = str(self.mediaPlayer.metaData("Resolution")).partition("PyQt5.QtCore.QSize(")[2].replace(", ", " x ").replace(")", "")
+                res = str(self.mediaPlayer.metaData("Resolution")).partition("PyQt5.QtCore.QSize(")[2].replace(", ", "x").replace(")", "")
                 print("%s%s" % ("Video Resolution = ",res))
+                if int(res.partition("x")[0]) / int(res.partition("x")[2]) < 1.5:
+                    self.screen43()
+                else:
+                    self.screen169()
             else:
                 print("no metaData available")
       
@@ -382,13 +393,7 @@ class VideoPlayer(QWidget):
             if len(matching) > 0:
                 self.loadFilm(matching)
 
-##################### update Label ##################################
-    def handleLabel(self):
-            self.lbl.clear()
-            mtime = QTime(0,0,0,0)
-            self.time = mtime.addMSecs(self.mediaPlayer.position())
-            self.lbl.setText(self.time.toString())
-###################################################################
+##################### end ##################################
 
 def stylesheet(self):
     return """
@@ -416,7 +421,7 @@ height: 8px;
 QSlider::handle:horizontal:hover {
 background: #2a82da;
 height: 8px;
-width: 8px;
+width: 18px;
 border: 1px solid #2e3436;
 }
 
