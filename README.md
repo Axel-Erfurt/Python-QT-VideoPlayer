@@ -7,6 +7,8 @@ cut Video (Qt4)
 # QT5_Videoplayer
 VideoPlayer (Qt5)
 
+press 'o' to open a video file or right mouse click for contextmenu
+
 ##creating an executable on Linux:
 ```
 pyinstaller QT5_VideoPlayer.py
