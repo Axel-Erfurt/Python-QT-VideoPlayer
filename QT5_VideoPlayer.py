@@ -1,15 +1,14 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtGui import QPalette, QKeySequence, QIcon
-from PyQt5.QtCore import QDir, Qt, QUrl, QSize, QPoint, QTime, QMimeData, QProcess, QEvent
-from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer, QMediaMetaData
+from PyQt5.QtGui import QKeySequence, QIcon
+from PyQt5.QtCore import QDir, Qt, QUrl, QPoint, QTime, QProcess
+from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWidgets import (QApplication, QFileDialog, QHBoxLayout, QLineEdit,
-                            QPushButton, QSizePolicy, QSlider, QMessageBox, QStyle, QVBoxLayout,  
+                            QPushButton, QSlider, QMessageBox, QStyle, QVBoxLayout,  
                             QWidget, QShortcut, QMenu)
 import sys
-import os
 import subprocess
 #QT_DEBUG_PLUGINS
 
@@ -234,7 +233,6 @@ class VideoPlayer(QWidget):
 
     def wheelEvent(self,event):
         mwidth = self.frameGeometry().width()
-        mheight = self.frameGeometry().height()
         mleft = self.frameGeometry().left()
         mtop = self.frameGeometry().top()
         mscale = event.angleDelta().y() / 5
@@ -242,13 +240,11 @@ class VideoPlayer(QWidget):
             self.setGeometry(mleft, mtop, mwidth + mscale, round((mwidth + mscale) / 1.778)) 
         else:
             self.setGeometry(mleft, mtop, mwidth + mscale, round((mwidth + mscale) / 1.33))
-        #elif self.positionSlider.hasFocus():
-        #    self.positionSlider.value = self.positionSlider.value + 5
+
 
     def screen169(self):
         self.widescreen = True
         mwidth = self.frameGeometry().width()
-        mheight = self.frameGeometry().height()
         mleft = self.frameGeometry().left()
         mtop = self.frameGeometry().top()
         mratio = 1.778
@@ -257,7 +253,6 @@ class VideoPlayer(QWidget):
     def screen43(self):
         self.widescreen = False
         mwidth = self.frameGeometry().width()
-        mheight = self.frameGeometry().height()
         mleft = self.frameGeometry().left()
         mtop = self.frameGeometry().top()
         mratio = 1.33
@@ -288,7 +283,6 @@ class VideoPlayer(QWidget):
             self.positionSlider.hide()
             self.elbl.hide()
             mwidth = self.frameGeometry().width()
-            mheight = self.frameGeometry().height()
             mleft = self.frameGeometry().left()
             mtop = self.frameGeometry().top()
             if self.widescreen == True:
@@ -302,7 +296,6 @@ class VideoPlayer(QWidget):
             self.positionSlider.show()
             self.elbl.show()
             mwidth = self.frameGeometry().width()
-            mheight = self.frameGeometry().height()
             mleft = self.frameGeometry().left()
             mtop = self.frameGeometry().top()
             if self.widescreen == True:
