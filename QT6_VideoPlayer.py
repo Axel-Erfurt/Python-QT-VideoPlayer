@@ -357,7 +357,7 @@ class VideoPlayer(QWidget):
     def mouseMoveEvent(self, evt):
         delta = evt.position() - self.oldPos
         self.move(round(self.x() + delta.x()), round(self.y() + delta.y()))
-        self.oldPos = evt.position()
+        #self.oldPos = evt.position()
         
     def dragEnterEvent(self, event):
         print("drag", event.mimeData())
