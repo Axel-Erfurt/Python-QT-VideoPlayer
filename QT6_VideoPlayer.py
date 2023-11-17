@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt6.QtGui import QKeySequence, QIcon, QShortcut, QDrag
-from PyQt6.QtCore import QDir, Qt, QUrl, QPoint, QTime, QProcess, QRect
+from PyQt6.QtCore import QDir, Qt, QUrl, QPoint, QTime, QProcess, QRect, QEvent
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtWidgets import (QApplication, QFileDialog, QHBoxLayout, QLineEdit,
@@ -126,11 +126,19 @@ class VideoPlayer(QWidget):
         self.mediaPlayer.positionChanged.connect(self.positionChanged)
         self.mediaPlayer.durationChanged.connect(self.durationChanged)
         self.mediaPlayer.errorChanged.connect(self.handleError)
+        self.setAttribute(Qt.WidgetAttribute.WA_Hover)
 
-        print("QT5 Player started")
+        print("QT6 Player started")
         print("press 'o' to open file (see context menu for more)")
         self.suspend_screensaver()
 
+    def event(self, event):
+        if event.type() == 127:
+            self.showSlider()
+        elif event.type() == 128:
+            self.hideSlider()
+        return super().event(event)
+        
         
     def mouseDoubleClickEvent(self, event):
         self.handleFullscreen()
@@ -145,7 +153,7 @@ class VideoPlayer(QWidget):
         print(self.myurl)
 
     def getYTUrl(self):
-        cmd = f"youtube-dl -g -f worst {self.clip.text()}"
+        cmd = f"yt-dlp -g -f worst {self.clip.text()}"
         print(f"grabbing YouTube URL\n{cmd}")
         #self.process.start(cmd)
         self.myurl = subprocess.check_output(cmd, shell=True).decode()
@@ -212,7 +220,7 @@ class VideoPlayer(QWidget):
         self.errorbox(self.mediaPlayer.errorString())
 
     def errorbox(self, message):
-        msg = QMessageBox(2, "Error", message, QMessageBox.Ok)
+        msg = QMessageBox(QMessageBox.Icon.Information, "Error", message, QMessageBox.StandardButton.Ok)
         msg.exec()
 
     def handleQuit(self):
@@ -279,22 +287,22 @@ class VideoPlayer(QWidget):
         if self.fullscreen == True:
             self.showNormal()
             self.setGeometry(self.rect)
-            QApplication.setOverrideCursor(Qt.BlankCursor)
+            QApplication.setOverrideCursor(Qt.CursorShape.BlankCursor)
             self.fullscreen = False
             print("Fullscreen aus")
         else:
             self.rect = self.geometry()
             self.showFullScreen()
-            QApplication.setOverrideCursor(Qt.ArrowCursor)
+            QApplication.setOverrideCursor(Qt.CursorShape.ArrowCursor)
             self.fullscreen = True
             print("Fullscreen an")
         self.handleCursor()
 
     def handleCursor(self):
-        if  QApplication.overrideCursor() ==  Qt.ArrowCursor:
-            QApplication.setOverrideCursor(Qt.BlankCursor)
+        if  QApplication.overrideCursor() ==  Qt.CursorShape.ArrowCursor:
+            QApplication.setOverrideCursor(Qt.CursorShape.BlankCursor)
         else:
-            QApplication.setOverrideCursor(Qt.ArrowCursor)
+            QApplication.setOverrideCursor(Qt.CursorShape.ArrowCursor)
 
     def handleInfo(self):
         msg = QMessageBox.about(self, "QT5 Player", self.myinfo)
@@ -356,8 +364,7 @@ class VideoPlayer(QWidget):
 
     def mouseMoveEvent(self, evt):
         delta = evt.position() - self.oldPos
-        self.move(round(self.x() + delta.x()), round(self.y() + delta.y()))
-        #self.oldPos = evt.position()
+        self.move(int(self.x() + delta.x()), int(self.y() + delta.y()))
         
     def dragEnterEvent(self, event):
         print("drag", event.mimeData())
@@ -476,12 +483,10 @@ font-weight: bold;
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     player = VideoPlayer('')
-    #player.setAcceptDrops(True)
-    player.setWindowTitle("QT5 Player")
+    player.setWindowTitle("QT6 Player")
     player.setWindowIcon(QIcon.fromTheme("multimedia-video-player"))
     player.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
-    player.setGeometry(100, 300, 600, 380)
-    #player.rect = player.geometry()
+    player.setGeometry(100, 50, 500, 280)
 
     player.hideSlider()
     player.show()
